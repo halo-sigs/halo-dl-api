@@ -2,6 +2,8 @@
 
 The workers script with deployment for the serverless [Halo Download Mirror](https://download.halo.run), created and maintained by [Nova Kwok](https://github.com/n0vad3v).
 
+Related Chinese post: [Halo 官方镜像源在 Serverless(Cloudflare Workers + R2) 上的实践](https://nova.moe/halo-mirror-serverless/).
+
 ## Usage
 
 ### Preparation
