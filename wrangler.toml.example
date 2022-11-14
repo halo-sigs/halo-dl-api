@@ -7,5 +7,5 @@ r2_buckets = [
 ]
 
 [triggers]
-crons = ["*/10 * * * *"]
+crons = ["0 */1 * * *"]
 
