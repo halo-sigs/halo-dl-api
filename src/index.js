@@ -9,7 +9,12 @@ export default {
 			include: ['customMetadata'],
 		}
 
-		// Check if vising /api, list all the files
+		// Check if visiting /, redirect to https://download.halo.run
+		if (uri === '') {
+			return Response.redirect('https://download.halo.run', 302)
+		}
+
+		// Check if visiting /api, list all the files
 		if (uri == "api") {
 			const listed = await env.dl_halo_run.list(options);
 
@@ -27,19 +32,19 @@ export default {
 					'content-type': 'application/json; charset=UTF-8',
 				}
 			});
-		} else {
-			// return the file
-			const file = await env.dl_halo_run.get(objectName);
-			if (!file) {
-				return new Response('File not found', { status: 404 })
-			}
-			const headers = new Headers()
-			file.writeHttpMetadata(headers)
-			headers.set('etag', file.httpEtag)
-			return new Response(file.body, {
-				headers
-			})
+		} 
+	
+		// Else, return the file
+		const file = await env.dl_halo_run.get(objectName);
+		if (!file) {
+			return new Response('File not found', { status: 404 })
 		}
+		const headers = new Headers()
+		file.writeHttpMetadata(headers)
+		headers.set('etag', file.httpEtag)
+		return new Response(file.body, {
+			headers
+		})
 	},
 	async scheduled(event, env, ctx) {
 		const HALO_API_URL = "https://api.github.com/repos/halo-dev/halo/releases?per_page=100"
@@ -85,6 +90,5 @@ export default {
 			}
 
 		};
-		return new Response(JSON.stringify({for_download_url_list}));
 	},
 };
