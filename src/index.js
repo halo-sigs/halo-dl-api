@@ -70,7 +70,7 @@ export default {
 			if (filename.endsWith('.jar')) {
 
 				let download_filname = ""
-				if (filename.includes('beta') || filename.includes('alpha')) {
+				if (filename.includes('beta') || filename.includes('alpha') || filename.includes('rc')) {
 					download_filname = "prerelease/" + filename;
 				} else {
 					download_filname = "release/" + filename;
