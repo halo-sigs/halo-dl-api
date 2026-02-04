@@ -96,9 +96,6 @@ export default {
           downloadFilename = "release/" + filename;
         }
 
-        // Check if exist in R2
-        console.log("Checking if exist in R2");
-
         const checkFile = await env.dl_halo_run.get(downloadFilename);
 
         console.log("Check file: ", checkFile);
