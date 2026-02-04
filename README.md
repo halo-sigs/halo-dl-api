@@ -12,28 +12,18 @@ Currently this script is hosted on Halo's Cloudflare Account, if you'd like to h
 
 * A Cloudflare account with API token
 * Cloudflare R2 and Workers enabled
-* `wrangler` installed (`npm i @cloudflare/wrangler -g`)
-
-Clone this repo and do the following steps:
-
-```
-cp .env.example .env
-cp wrangler.toml.example wrangler.toml
-```
-
-Now edit the related variables in the files above.
 
 ### Deploy
 
-```
-wrangler publish
+```bash
+wrangler deploy
 ```
 
 Now the worker is available on your Cloudflare account with cron setup, wait for 10 minutes and you should see files being downloaded to your R2 bucket.
 
 Visiting `https://your-workers.workers.dev/api` will get the results as below:
 
-```
+```json
 [
   {
     "uploaded": "2022-11-13T06:34:09.717Z",

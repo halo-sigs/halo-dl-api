@@ -1,12 +1,16 @@
 {
-  "name": "nova-r2",
-  "version": "0.0.0",
-  "devDependencies": {
-    "wrangler": "2.1.15"
-  },
-  "private": true,
+  "name": "halo-dl-api",
+  "type": "module",
   "scripts": {
-    "start": "wrangler dev",
-    "deploy": "wrangler publish"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "hono": "^4.11.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.4.0"
   }
 }
