@@ -31,7 +31,7 @@ app.get("/api", async (c) => {
         size: object.size,
         key: object.key,
       };
-    }),
+    })
   );
 });
 
@@ -78,7 +78,7 @@ export default {
         const downloadUrl = asset.browser_download_url;
         const assetId = asset.id;
         const filename = downloadUrl.substring(
-          downloadUrl.lastIndexOf("/") + 1,
+          downloadUrl.lastIndexOf("/") + 1
         );
 
         if (!filename.endsWith(".jar")) {
@@ -109,22 +109,23 @@ export default {
           console.log("Downloading file: " + filename);
 
           if (repo.pat) {
-            const response = await client.repos.getReleaseAsset({
-              owner: repo.owner,
-              repo: repo.repo,
-              asset_id: assetId,
+            const response = await fetch(asset.url, {
               headers: {
-                accept: "application/octet-stream",
+                Accept: "application/octet-stream",
+                Authorization: `Bearer ${repo.pat}`,
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent":
+                  "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
               },
             });
-
-            await env.dl_halo_run.put(
-              downloadFilename,
-              // @ts-ignore
-              response.data as ArrayBuffer,
-            );
+            await env.dl_halo_run.put(downloadFilename, response.body);
           } else {
-            const response = await fetch(downloadUrl);
+            const response = await fetch(downloadUrl, {
+              headers: {
+                "User-Agent":
+                  "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
+              },
+            });
             await env.dl_halo_run.put(downloadFilename, response.body);
           }
         } else {
