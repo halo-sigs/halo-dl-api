@@ -51,13 +51,13 @@ export default {
   scheduled: async (_controller, env, _ctx) => {
     const repos = [
       {
-        owner: "halo-dev",
-        repo: "halo",
-      },
-      {
         owner: "lxware-dev",
         repo: "halo-pro",
         pat: env.GITHUB_HALO_PRO_PAT,
+      },
+      {
+        owner: "halo-dev",
+        repo: "halo",
       },
     ];
 
@@ -72,17 +72,22 @@ export default {
         per_page: 100,
       });
 
-      const downloadUrls = releases
-        .map((release) =>
-          release.assets.map((asset) => asset.browser_download_url)
-        )
-        .flat()
-        .filter((url) => url.endsWith(".jar"));
+      const assets = releases.map((release) => release.assets).flat();
 
-      for (const downloadUrl of downloadUrls) {
+      for (const asset of assets) {
+        const downloadUrl = asset.browser_download_url;
+        const assetId = asset.id;
         const filename = downloadUrl.substring(
           downloadUrl.lastIndexOf("/") + 1
         );
+
+        if (!filename.endsWith(".jar")) {
+          continue;
+        }
+
+        if (filename.startsWith("pro-api")) {
+          continue;
+        }
 
         let downloadFilename = "";
 
@@ -103,8 +108,25 @@ export default {
         if (!checkFile) {
           console.log("Downloading file: " + filename);
 
-          const response = await fetch(downloadUrl);
-          await env.dl_halo_run.put(downloadFilename, response.body);
+          if (repo.pat) {
+            const response = await client.repos.getReleaseAsset({
+              owner: repo.owner,
+              repo: repo.repo,
+              asset_id: assetId,
+              headers: {
+                accept: "application/octet-stream",
+              },
+            });
+
+            await env.dl_halo_run.put(
+              downloadFilename,
+              // @ts-ignore
+              response.data as ArrayBuffer
+            );
+          } else {
+            const response = await fetch(downloadUrl);
+            await env.dl_halo_run.put(downloadFilename, response.body);
+          }
         } else {
           console.log("File already exist in R2: " + downloadFilename);
         }
