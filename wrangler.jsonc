@@ -4,9 +4,6 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-02-04",
   "compatibility_flags": ["nodejs_compat"],
-  "vars": {
-    "GITHUB_HALO_PRO_PAT": ""
-  },
   "r2_buckets": [
     {
       "binding": "dl_halo_run",
