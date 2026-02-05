@@ -31,7 +31,7 @@ app.get("/api", async (c) => {
         size: object.size,
         key: object.key,
       };
-    })
+    }),
   );
 });
 
@@ -66,19 +66,19 @@ export default {
         auth: repo.pat,
       });
 
-      const releases = await client.paginate(client.repos.listReleases, {
+      const releases = await client.repos.listReleases({
         owner: repo.owner,
         repo: repo.repo,
-        per_page: 100,
+        per_page: 10,
       });
 
-      const assets = releases.map((release) => release.assets).flat();
+      const assets = releases.data.map((release) => release.assets).flat();
 
       for (const asset of assets) {
         const downloadUrl = asset.browser_download_url;
         const assetId = asset.id;
         const filename = downloadUrl.substring(
-          downloadUrl.lastIndexOf("/") + 1
+          downloadUrl.lastIndexOf("/") + 1,
         );
 
         if (!filename.endsWith(".jar")) {
@@ -101,7 +101,7 @@ export default {
           downloadFilename = "release/" + filename;
         }
 
-        const checkFile = await env.dl_halo_run.get(downloadFilename);
+        const checkFile = await env.dl_halo_run.head(downloadFilename);
 
         console.log("Check file: ", checkFile);
 
@@ -121,7 +121,7 @@ export default {
             await env.dl_halo_run.put(
               downloadFilename,
               // @ts-ignore
-              response.data as ArrayBuffer
+              response.data as ArrayBuffer,
             );
           } else {
             const response = await fetch(downloadUrl);
