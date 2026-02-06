@@ -31,7 +31,7 @@ app.get("/api", async (c) => {
         size: object.size,
         key: object.key,
       };
-    })
+    }),
   );
 });
 
@@ -44,6 +44,15 @@ app.get("/:name{.+\\.jar}", async (c) => {
   return c.body(file.body, 200, {
     etag: file.httpEtag,
   });
+});
+
+app.get("/:name{.+\\.jar.sha256}", async (c) => {
+  const name = c.req.param("name");
+  const file = await c.env.dl_halo_run.get(name);
+  if (!file) {
+    return c.notFound();
+  }
+  return c.text(await file.text());
 });
 
 export default {
@@ -76,12 +85,11 @@ export default {
 
       for (const asset of assets) {
         const downloadUrl = asset.browser_download_url;
-        const assetId = asset.id;
         const filename = downloadUrl.substring(
-          downloadUrl.lastIndexOf("/") + 1
+          downloadUrl.lastIndexOf("/") + 1,
         );
 
-        if (!filename.endsWith(".jar")) {
+        if (!filename.endsWith(".jar") && !filename.endsWith(".jar.sha256")) {
           continue;
         }
 
