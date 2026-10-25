@@ -1,23 +1,11 @@
-import { RestEndpointMethodTypes } from "@octokit/rest";
-import { Hono } from "hono";
-import { timingSafeEqual, signBody } from "./utils/webhook";
-
-type Bindings = {
-  dl_halo_run: R2Bucket;
-  GITHUB_HALO_PRO_PAT: string;
-  GITHUB_WEBHOOK_SECRET: string;
-};
+import type { RestEndpointMethodTypes } from "@octokit/rest";
+import { createRoute } from "honox/factory";
+import { signBody, timingSafeEqual } from "../../lib/webhook";
 
 type ReleaseItem =
   RestEndpointMethodTypes["repos"]["listReleases"]["response"]["data"][number];
 
-const app = new Hono<{ Bindings: Bindings }>();
-
-app.get("/", (c) => {
-  return c.redirect("https://download.halo.run", 302);
-});
-
-app.post("/github/webhook", async (c) => {
+export const POST = createRoute(async (c) => {
   const githubEvent = c.req.header("x-github-event");
 
   if (githubEvent !== "release") {
@@ -35,20 +23,29 @@ app.post("/github/webhook", async (c) => {
     return c.json({ ok: false, error: "Missing signature" }, 401);
   }
 
-  const expectedSignature = await signBody(
-    c.env.GITHUB_WEBHOOK_SECRET,
-    rawBody,
-  );
+  const secret = c.env.GITHUB_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error("GITHUB_WEBHOOK_SECRET is not configured");
+    return c.json({ ok: false, error: "Webhook secret is not configured" }, 500);
+  }
+
+  const expectedSignature = await signBody(secret, rawBody);
 
   if (!timingSafeEqual(signatureHeader, expectedSignature)) {
     return c.json({ ok: false, error: "Invalid signature" }, 401);
   }
 
-  const payload = JSON.parse(rawBody) as {
+  let payload: {
     action?: string;
     repository?: { full_name?: string };
     release?: ReleaseItem;
   };
+
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    return c.json({ ok: false, error: "Invalid JSON body" }, 400);
+  }
 
   const action = payload.action;
 
@@ -56,7 +53,7 @@ app.post("/github/webhook", async (c) => {
     return c.json({ ok: true, ignored: true, action });
   }
 
-  if (!payload.release?.assets.length) {
+  if (!payload.release?.assets?.length) {
     return c.json({ ok: true, ignored: true, action });
   }
 
@@ -97,6 +94,15 @@ app.post("/github/webhook", async (c) => {
               "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
           },
         });
+        if (!response.ok || !response.body) {
+          console.error(
+            `Failed to download ${downloadFilename}: ${response.status}`,
+          );
+          return c.json(
+            { ok: false, error: "Failed to download release asset" },
+            502,
+          );
+        }
         await c.env.dl_halo_run.put(downloadFilename, response.body);
       } else {
         const response = await fetch(downloadUrl, {
@@ -105,6 +111,15 @@ app.post("/github/webhook", async (c) => {
               "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
           },
         });
+        if (!response.ok || !response.body) {
+          console.error(
+            `Failed to download ${downloadFilename}: ${response.status}`,
+          );
+          return c.json(
+            { ok: false, error: "Failed to download release asset" },
+            502,
+          );
+        }
         await c.env.dl_halo_run.put(downloadFilename, response.body);
       }
     } else {
@@ -114,56 +129,3 @@ app.post("/github/webhook", async (c) => {
 
   return c.json({ ok: true, action });
 });
-
-app.get("/api", async (c) => {
-  const objects: R2Object[] = [];
-  let cursor: string | undefined;
-
-  do {
-    const listed = await c.env.dl_halo_run.list({
-      limit: 1000,
-      include: ["customMetadata"],
-      cursor,
-    });
-
-    objects.push(...listed.objects);
-    cursor = listed.cursor;
-  } while (cursor);
-
-  return c.json(
-    objects.map((object) => {
-      return {
-        storageClass: object.storageClass,
-        uploaded: object.uploaded,
-        checksums: object.checksums,
-        size: object.size,
-        key: object.key,
-      };
-    }),
-  );
-});
-
-app.get("/:name{.+\\.jar}", async (c) => {
-  const name = c.req.param("name");
-  const file = await c.env.dl_halo_run.get(name);
-  if (!file) {
-    return c.notFound();
-  }
-  return c.body(file.body, 200, {
-    etag: file.httpEtag,
-  });
-});
-
-app.get("/:name{.+\\.jar.sha256}", async (c) => {
-  const name = c.req.param("name");
-  console.log("Getting file: ", name);
-  const file = await c.env.dl_halo_run.get(name);
-  if (!file) {
-    return c.notFound();
-  }
-  return c.text(await file.text());
-});
-
-export default {
-  fetch: app.fetch,
-} as ExportedHandler<Bindings>;

@@ -1,9 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "halo-dl-api",
-  "main": "src/index.ts",
+  "main": "./dist/index.js",
   "compatibility_date": "2026-02-04",
   "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist"
+  },
+  "build": {
+    "command": "pnpm run build"
+  },
   "r2_buckets": [
     {
       "binding": "dl_halo_run",

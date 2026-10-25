@@ -3,7 +3,7 @@
 // Runtime types generated with workerd@1.20260131.0 2026-02-04 nodejs_compat
 declare namespace Cloudflare {
 	interface GlobalProps {
-		mainModule: typeof import("./src/index");
+		mainModule: typeof import("./app/server");
 	}
 	interface Env {
 		dl_halo_run: R2Bucket;
