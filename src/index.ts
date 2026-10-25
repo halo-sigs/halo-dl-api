@@ -116,14 +116,19 @@ app.post("/github/webhook", async (c) => {
 });
 
 app.get("/api", async (c) => {
-  const options: R2ListOptions = {
-    limit: 500,
-    include: ["customMetadata"],
-  };
+  const objects: R2Object[] = [];
+  let cursor: string | undefined;
 
-  const listed = await c.env.dl_halo_run.list(options);
+  do {
+    const listed = await c.env.dl_halo_run.list({
+      limit: 1000,
+      include: ["customMetadata"],
+      cursor,
+    });
 
-  const objects = listed.objects;
+    objects.push(...listed.objects);
+    cursor = listed.cursor;
+  } while (cursor);
 
   return c.json(
     objects.map((object) => {
