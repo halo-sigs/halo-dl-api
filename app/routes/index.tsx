@@ -19,7 +19,7 @@ export default createRoute(async (c) => {
                 {group.items.map((item) => (
                   <li
                     key={item.key}
-                    class="hover:ring-1 group transition-all rounded cursor-pointer -mx-2 px-2 py-2 hover:bg-indigo-50"
+                    class="hover:ring-1 hover:ring-[#3b82f680] group transition-all rounded cursor-pointer -mx-2 px-2 py-2 hover:bg-indigo-50"
                   >
                     <div
                       class="flex justify-between items-center gap-1"

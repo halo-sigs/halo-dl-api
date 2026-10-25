@@ -2,8 +2,10 @@ import { jsxRenderer } from "hono/jsx-renderer";
 import { Link } from "honox/server";
 
 export default jsxRenderer(({ children }) => {
+  // No lang attribute: setting one changes Chrome's macOS CJK fallback from
+  // PingFang UI to PingFang SC, which visibly differs from the old site.
   return (
-    <html lang="zh-CN">
+    <html>
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
