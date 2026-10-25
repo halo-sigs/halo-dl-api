@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  color: #333;
+  gap: 0.4rem;
+  text-decoration: none;
+  border-radius: 0.3rem;
+  background-color: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.repo-link svg {
+  flex: none;
+}
+
+.repo-link:hover {
+  background-color: #e5e7eb;
+  outline: none;
+  box-shadow: 0 0 0 1px rgb(37 99 235);
+}
