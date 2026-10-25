@@ -2,3 +2,15 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
   - workerd
+overrides:
+  miniflare>sharp: ^0.35.5
+  miniflare>undici: ^7.30.1
+  vite@*: "catalog:"
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite-plus: 1.4.0
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"

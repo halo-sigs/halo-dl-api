@@ -2,8 +2,7 @@ import type { RestEndpointMethodTypes } from "@octokit/rest";
 import { createRoute } from "honox/factory";
 import { signBody, timingSafeEqual } from "../../lib/webhook";
 
-type ReleaseItem =
-  RestEndpointMethodTypes["repos"]["listReleases"]["response"]["data"][number];
+type ReleaseItem = RestEndpointMethodTypes["repos"]["listReleases"]["response"]["data"][number];
 
 export const POST = createRoute(async (c) => {
   const githubEvent = c.req.header("x-github-event");
@@ -71,11 +70,7 @@ export const POST = createRoute(async (c) => {
 
     let downloadFilename = "";
 
-    if (
-      filename.includes("beta") ||
-      filename.includes("alpha") ||
-      filename.includes("rc")
-    ) {
+    if (filename.includes("beta") || filename.includes("alpha") || filename.includes("rc")) {
       downloadFilename = "prerelease/" + filename;
     } else {
       downloadFilename = "release/" + filename;
@@ -90,35 +85,23 @@ export const POST = createRoute(async (c) => {
             Accept: "application/octet-stream",
             Authorization: `Bearer ${c.env.GITHUB_HALO_PRO_PAT}`,
             "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent":
-              "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
           },
         });
         if (!response.ok || !response.body) {
-          console.error(
-            `Failed to download ${downloadFilename}: ${response.status}`,
-          );
-          return c.json(
-            { ok: false, error: "Failed to download release asset" },
-            502,
-          );
+          console.error(`Failed to download ${downloadFilename}: ${response.status}`);
+          return c.json({ ok: false, error: "Failed to download release asset" }, 502);
         }
         await c.env.dl_halo_run.put(downloadFilename, response.body);
       } else {
         const response = await fetch(downloadUrl, {
           headers: {
-            "User-Agent":
-              "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
           },
         });
         if (!response.ok || !response.body) {
-          console.error(
-            `Failed to download ${downloadFilename}: ${response.status}`,
-          );
-          return c.json(
-            { ok: false, error: "Failed to download release asset" },
-            502,
-          );
+          console.error(`Failed to download ${downloadFilename}: ${response.status}`);
+          return c.json({ ok: false, error: "Failed to download release asset" }, 502);
         }
         await c.env.dl_halo_run.put(downloadFilename, response.body);
       }

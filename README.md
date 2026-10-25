@@ -19,9 +19,9 @@ Related Chinese post: [Halo 官方镜像源在 Serverless(Cloudflare Workers + R
 
 Currently this project is hosted on Halo's Cloudflare Account. If you'd like to host it on your own, you need:
 
-* A Cloudflare account with API token
-* Cloudflare R2 and Workers enabled
-* `GITHUB_HALO_PRO_PAT` and `GITHUB_WEBHOOK_SECRET` configured as Worker secrets
+- A Cloudflare account with API token
+- Cloudflare R2 and Workers enabled
+- `GITHUB_HALO_PRO_PAT` and `GITHUB_WEBHOOK_SECRET` configured as Worker secrets
 
 ### Development
 

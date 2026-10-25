@@ -55,11 +55,7 @@ function compareVersions(a: R2Object, b: R2Object) {
     return 1;
   }
 
-  for (
-    let i = 0;
-    i < Math.max(parsedA.prerelease.length, parsedB.prerelease.length);
-    i++
-  ) {
+  for (let i = 0; i < Math.max(parsedA.prerelease.length, parsedB.prerelease.length); i++) {
     const partA = parsedA.prerelease[i];
     const partB = parsedB.prerelease[i];
 
@@ -110,9 +106,7 @@ export function groupReleases(objects: R2Object[]): ReleaseGroup[] {
   const pro = objects
     .filter(
       (item) =>
-        item.key.startsWith("release/") &&
-        item.key.includes("pro") &&
-        !item.key.includes("sha256"),
+        item.key.startsWith("release/") && item.key.includes("pro") && !item.key.includes("sha256"),
     )
     .sort(compareVersions);
 
