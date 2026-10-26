@@ -1,6 +1,6 @@
 # Halo Download Mirror Service(Serverless Edition)
 
-The serverless [Halo Download Mirror](https://download.halo.run), running on Cloudflare Workers + R2. The download page and the API are served by the same Worker.
+The serverless [Halo Download Mirror](https://dl.halo.run), running on Cloudflare Workers + R2. The download page and the API are served by the same Worker.
 
 Created and maintained by [Nova Kwok](https://github.com/n0vad3v).
 
